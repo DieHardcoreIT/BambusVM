@@ -1,5 +1,5 @@
 # BambusVM
-BambusVM is a code virtualizer for .NET framework, which is based on <a href="https://github.com/hexck/Hex-Virtualization">Hex Virtualization</a>.
+BambusVM is a code virtualizer for .NET framework Applications, which is based on <a href="https://github.com/hexck/Hex-Virtualization">Hex Virtualization</a>.
 
 ## What was BambusVM developed for?
 It was developed so that interested people can learn from it or get inspired by it. This VM is NOT meant for real world use. As devirtualization will be very easy compared to other VM's and there are still some bugs to fix.
