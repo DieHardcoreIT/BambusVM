@@ -1,12 +1,11 @@
 using BambusVM.Runtime.Util;
 
-namespace BambusVM.Runtime.Handler.Impl
+namespace BambusVM.Runtime.Handler.Impl;
+
+public class Nop : BambusOpCode
 {
-    public class Nop : BambusOpCode
+    public override void Execute(Context vmContext, BambusInstruction instruction)
     {
-        public override void Execute(Context vmContext, BambusInstruction instruction)
-        {
-            //do nothing
-        }
+        // do nothing
     }
 }

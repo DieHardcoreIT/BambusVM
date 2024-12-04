@@ -1,14 +1,13 @@
 using BambusVM.Runtime.Util;
 
-namespace BambusVM.Runtime.Handler.Impl
-{
-    public class Neg : BambusOpCode
-    {
-        public override void Execute(Context vmContext, BambusInstruction instruction)
-        {
-            dynamic x = vmContext.Stack.Pop();
+namespace BambusVM.Runtime.Handler.Impl;
 
-            vmContext.Stack.Push(-x);
-        }
+public class Neg : BambusOpCode
+{
+    public override void Execute(Context vmContext, BambusInstruction instruction)
+    {
+        var x = vmContext.Stack.Pop();
+
+        vmContext.Stack.Push(-x);
     }
 }

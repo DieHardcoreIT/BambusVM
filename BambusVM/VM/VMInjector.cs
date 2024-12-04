@@ -3,52 +3,69 @@ using dnlib.DotNet.Writer;
 using System.Collections.Generic;
 using System.IO;
 
-namespace BambusVM.VM
+namespace BambusVM.VM;
+
+internal class VMInjector
 {
-    internal class VMInjector
+    /// <summary>
+    /// Injects the BambusVM runtime code into the specified module.
+    /// This method loads the VM runtime DLL, extracts all types that contain
+    /// 'BambusVM', clears them from the runtime DLL to avoid errors,
+    /// and then adds them to the given module.
+    /// </summary>
+    /// <param name="module">
+    /// The module where the VM runtime code will be injected.
+    /// This parameter is passed by reference and will be modified
+    /// to include the VM types.
+    /// </param>
+    internal static void InjectVmCode(ref ModuleDefMD module)
     {
-        internal static void InjectVmCode(ref ModuleDefMD module)
+        // Load the VM runtime DLL
+        var vmRuntimeAssemblyDef = AssemblyDef.Load("BambusVM.Runtime.dll");
+
+        // Store all types from the VM
+        var typeDefs = new List<TypeDef>();
+
+        // Read all VM types that contain 'BambusVM' from the DLL
+        foreach (var modules in vmRuntimeAssemblyDef.Modules)
+        foreach (var vmRuntimeType in modules.Types)
         {
-            //load vm runtime dll
-            var vmRuntimeAssemblyDef = AssemblyDef.Load("BambusVM.Runtime.dll");
-
-            //here we store all types
-            var typeDefs = new List<TypeDef>();
-
-            //now we read all vm types from the dll
-            foreach (var modules in vmRuntimeAssemblyDef.Modules)
-                foreach (var vmRuntimeType in modules.Types)
-                {
-                    if (!vmRuntimeType.FullName.Contains("BambusVM"))
-                        continue;
-                    typeDefs.Add(vmRuntimeType);
-                }
-
-            //now we have to remove all types from the dll otherwise there will be an error.  I don't know how else to do it, but it works.
-            foreach (var modules in vmRuntimeAssemblyDef.Modules)
-                modules.Types.Clear();
-
-            //now we can finally add all modules to the original exe
-            foreach (var typeDef in typeDefs) 
-                module.Types.Add(typeDef);
-
-            WriteVmToDllAndReloadModule(ref module);
+            if (!vmRuntimeType.FullName.Contains("BambusVM"))
+                continue;
+            typeDefs.Add(vmRuntimeType);
         }
 
-        private static void WriteVmToDllAndReloadModule(ref ModuleDefMD module)
+        // Clear all types from the DLL to avoid errors
+        foreach (var modules in vmRuntimeAssemblyDef.Modules)
+            modules.Types.Clear();
+
+        // Add all VM types to the original module
+        foreach (var typeDef in typeDefs)
+            module.Types.Add(typeDef);
+
+        WriteVmToDllAndReloadModule(ref module);
+    }
+
+    /// <summary>
+    /// Writes the given module to a temporary DLL file and reloads the module from this file.
+    /// This allows any changes made to the module to be saved and reloaded for further processing.
+    /// </summary>
+    /// <param name="module">
+    /// A reference to the <see cref="ModuleDefMD"/> instance representing the module to be written and reloaded.
+    /// </param>
+    private static void WriteVmToDllAndReloadModule(ref ModuleDefMD module)
+    {
+        var modOpts = new ModuleWriterOptions(module)
         {
-            var modOpts = new ModuleWriterOptions(module)
-            {
-                //ignore all errors
-                MetadataLogger = DummyLogger.NoThrowInstance
-            };
+            // Ignore all errors during the write process
+            MetadataLogger = DummyLogger.NoThrowInstance
+        };
 
-            var mem = new MemoryStream();
-            module.Write(mem, modOpts); //save the module.
-            File.WriteAllBytes("BambusVM.tmp", mem.ToArray());
+        var mem = new MemoryStream();
+        module.Write(mem, modOpts); // Write the module to memory
+        File.WriteAllBytes("BambusVM.tmp", mem.ToArray()); // Save the module to a temporary file
 
-            //load the module
-            module = ModuleDefMD.Load("BambusVM.tmp");
-        }
+        // Reload the module from the temporary file
+        module = ModuleDefMD.Load("BambusVM.tmp");
     }
 }

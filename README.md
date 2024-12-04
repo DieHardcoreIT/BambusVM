@@ -26,7 +26,6 @@ BambusVM converts all the code into "Bambus instructions" that only the VM or th
 ## Credits
 
 - BambusVM is based on <a href="https://github.com/hexck/Hex-Virtualization">Hex Virtualization</a> from <a href="https://github.com/hexck">Hexk</a>.
-- AES code by <a href="https://www.siakabaro.com/how-to-perform-aes-encryption-in-net/">siakabaro</a>
 
 ## License
 BambusVM is licensed under the MIT License.

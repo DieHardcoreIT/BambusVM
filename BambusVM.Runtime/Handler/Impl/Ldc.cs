@@ -1,12 +1,11 @@
 ﻿using BambusVM.Runtime.Util;
 
-namespace BambusVM.Runtime.Handler.Impl
+namespace BambusVM.Runtime.Handler.Impl;
+
+internal class Ldc : BambusOpCode
 {
-    internal class Ldc : BambusOpCode
+    public override void Execute(Context vmContext, BambusInstruction instruction)
     {
-        public override void Execute(Context vmContext, BambusInstruction instruction)
-        {
-            vmContext.Stack.Push(instruction.Operand);
-        }
+        vmContext.Stack.Push(instruction.Operand);
     }
 }
